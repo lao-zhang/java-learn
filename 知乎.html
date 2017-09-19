@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+   <head>
+       <title>知乎</title>
+       <style type="text/css">
+           
+        /*html5文本输入栏样式引用，支持chrome浏览器，使文本栏附带背景提示语*/
+           
+           /* WebKit browsers */    
+     ::-webkit-input-placeholder {
+	  color:#E0E0E0;
+         padding-left:5px;
+         font-size:15px;
+           }
+/* Mozilla Firefox 4 to 18 */
+:-moz-placeholder {
+	color:#E0E0E0;
+         padding-left:5px;
+         font-size:15px;
+}
+/* Mozilla Firefox 19+ */
+::-moz-placeholder {
+	color:#E0E0E0;
+         padding-left:5px;
+         font-size:15px;
+}
+/* Internet Explorer 10+ */
+:-ms-input-placeholder {
+	color:#E0E0E0;
+         padding-left:5px;
+         font-size:15px;
+}
+           
+           /*c1～c8：各个部位的样式类*/
+           .c1{
+               color:#0080FF;
+               text-align: center;
+               font-size: 80px;
+               font-family:serif;
+               margin: 10px;
+               
+           }
+           .c2{
+               color:dimgray;
+               text-align: center;
+               font-size:19px;
+               margin: 10px;
+               
+           }
+           .c3{
+               text-align: center;
+               
+           }
+           .c4{
+               width: 300px;
+               height:45px;
+               outline: none;
+               font-size: 15px;
+               color:#4F4F4F;
+               padding-left: 5px;
+              
+               
+               
+           }
+           .c5{
+               text-align: center;
+               color:white;
+               font-size: 15px;
+               width: 300px;
+               height:45px;
+               background-color:#0080FF;
+               border:none;
+               line-height:20px;
+               border-radius:4px;
+               outline: none;
+               
+           }
+           .c6{
+               color: darkgray;
+               font-size: 13px;
+           }
+           .c7{
+               text-align:center;
+               color:#66B3FF;
+               font-size: 15px;
+               width: 300px;
+               height:42px;
+               border-width:1px;
+               border-style:solid;
+               line-height:20px;
+               border-radius:4px;
+               background: transparent;
+               border-color:#66B3FF;
+               outline: none;
+               
+            }
+           .c8{
+               color: whitesmoke;
+               width: 420px;
+               border-style:solid;
+               
+            
+           }
+           .c9{
+               color:darkgray;
+               font-size:18px;
+               width: 60px;
+               height: 40px;
+               margin: 1px;
+               padding: 7px;
+               background: transparent;
+               border: none;
+               outline: none;
+        
+           }
+           .c10{
+            
+               color:darkgray;
+               font-size:18px;
+               width: 60px;
+               height: 40px;
+               margin: 1px;
+               padding: 7px;
+               background: transparent;
+               border: none;
+               outline: none;
+               display: none;
+               
+           }
+           .c11{
+               text-align: center;
+               color:white;
+               font-size: 15px;
+               width: 300px;
+               height:45px;
+               background-color:#0080FF;
+               border:none;
+               line-height:20px;
+               border-radius:4px;
+               outline: none;
+               display:none;
+               
+           }
+       </style>
+       <script type="text/javascript">
+           function change2()
+           {
+               document.getElementById("t1").style.display="none";
+               document.getElementById("t2").style.display="none";
+               document.getElementById("t3").style.display="none";
+               document.getElementById("t4").style.display="run-in";
+               document.getElementById("t5").style.display="run-in";
+               document.getElementById("b1").style.display="none";
+               document.getElementById("b2").style.display="show";
+           }
+</script>
+       
+    </head>
+     <body style="background-color:#FCFCFC">
+         <canvas id="Mycanvas" style="position:absolute;z-index:-1"></canvas>
+    <script>
+        
+         /*canvas绘图，实现动态效果，再将canvas样式属性设置为：position:absolute;z-index:-1
+           position:absolute;：使div的位置固定，也就是用浏览器的绝对位置的显示div；
+           z-index:-1；可以定义元素在HTML在页面中的顺序层叠，这里将canvas动态绘图的此属性设置为-1，
+         从而将其设置为网页的背景；*/
+        
+        //定义画布宽高和生成点的个数
+        var WIDTH = window.innerWidth, HEIGHT = window.innerHeight, POINT = 20;
+        var canvas = document.getElementById('Mycanvas');
+        canvas.width = WIDTH,
+        canvas.height = HEIGHT;
+        var context = canvas.getContext('2d');
+        context.strokeStyle = 'rgba(0,0,0,0.02)',
+        context.strokeWidth = 1,
+        context.fillStyle = 'rgba(0,0,0,0.05)';
+        var circleArr = [];
+ 
+        //线条：开始xy坐标，结束xy坐标，线条透明度
+        function Line (x, y, _x, _y, o) {
+            this.beginX = x,
+            this.beginY = y,
+            this.closeX = _x,
+            this.closeY = _y,
+            this.o = o;
+        }
+        //点：圆心xy坐标，半径，每帧移动xy的距离
+        function Circle (x, y, r, moveX, moveY) {
+            this.x = x,
+            this.y = y,
+            this.r = r,
+            this.moveX = moveX,
+            this.moveY = moveY;
+        }
+        //生成max和min之间的随机数
+        function num (max, _min) {
+            var min = arguments[1] || 0;
+            return Math.floor(Math.random()*(max-min+1)+min);
+        }
+        // 绘制原点
+        function drawCricle (cxt, x, y, r, moveX, moveY) {
+            var circle = new Circle(x, y, r, moveX, moveY)
+            cxt.beginPath()
+            cxt.arc(circle.x, circle.y, circle.r, 0, 2*Math.PI)
+            cxt.closePath()
+            cxt.fill();
+            return circle;
+        }
+        //绘制线条
+        function drawLine (cxt, x, y, _x, _y, o) {
+            var line = new Line(x, y, _x, _y, o)
+            cxt.beginPath()
+            cxt.strokeStyle = 'rgba(0,0,0,'+ o +')'
+            cxt.moveTo(line.beginX, line.beginY)
+            cxt.lineTo(line.closeX, line.closeY)
+            cxt.closePath()
+            cxt.stroke();
+ 
+        }
+        //初始化生成原点
+        function init () {
+            circleArr = [];
+            for (var i = 0; i < POINT; i++) {
+                circleArr.push(drawCricle(context, num(WIDTH), num(HEIGHT), num(15, 2), num(10, -10)/40, num(10, -10)/40));
+            }
+            draw();
+        }
+ 
+        //每帧绘制
+        function draw () {
+            context.clearRect(0,0,canvas.width, canvas.height);
+            for (var i = 0; i < POINT; i++) {
+                drawCricle(context, circleArr[i].x, circleArr[i].y, circleArr[i].r);
+            }
+            for (var i = 0; i < POINT; i++) {
+                for (var j = 0; j < POINT; j++) {
+                    if (i + j < POINT) {
+                        var A = Math.abs(circleArr[i+j].x - circleArr[i].x),
+                            B = Math.abs(circleArr[i+j].y - circleArr[i].y);
+                        var lineLength = Math.sqrt(A*A + B*B);
+                        var C = 1/lineLength*6-0.009;
+                        var lineOpacity = C > 0.03 ? 0.03 : C;
+                        if (lineOpacity > 0) {
+                            drawLine(context, circleArr[i].x, circleArr[i].y, circleArr[i+j].x, circleArr[i+j].y, lineOpacity);
+                        }
+                    }
+                }
+            }
+        }
+ 
+        //调用执行
+        window.onload = function () {
+            init();
+            setInterval(function () {
+                for (var i = 0; i < POINT; i++) {
+                    var cir = circleArr[i];
+                    cir.x += cir.moveX;
+                    cir.y += cir.moveY;
+                    if (cir.x > WIDTH) cir.x = 0;
+                    else if (cir.x < 0) cir.x = WIDTH;
+                    if (cir.y > HEIGHT) cir.y = 0;
+                    else if (cir.y < 0) cir.y = HEIGHT;
+                     
+                }
+                draw();
+            },12);
+        }
+       
+  </script>
+        <div>
+        <br>
+        <h1 class="c1">知乎</h1>
+        <p class="c2">与世界分享你的知识、经验和见解</p>
+        </div>
+         <div style="text-align:center">
+            <input type="button" class="c9" id="注册" value="注册" onmouseover="this.style.color='dimgray'" onmouseout="this.style.color='darkgray'" onmousedown="this.style.color='#0080FF'" onmouseup="this.style.color='darkgray'">
+            <input type="button" class="c9" id="登录" value="登录" onmouseover="this.style.color='dimgray'" onmouseout="this.style.color='darkgray'"
+            onmousedown="this.style.color='#0080FF'" onmouseup="this.style.color='darkgray'" onclick="change2()">
+         </div>
+            <br>
+         <div class="c3">
+            <input type="text" class="c4" name="t1" placeholder="姓名" ><br>
+            <input type="text" class="c4" name="t2" placeholder="手机号"><br>
+            <input type="text" class="c4" name="t3" placeholder="密码（不少于6位）"><br>
+            <input type="text" class="c10" name="t4" placeholder="手机号或邮箱">
+            <input type="text" class="c10" name="t5" placeholder="密码">
+            <br>
+        <input type="button" class="c5" name="b1" value="注册知乎" onmouseover="this.style.backgroundColor='#66B3FF'" onmouseout="this.style.backgroundColor='#0080FF'">
+        <input type="button" class="c11"  name="b2" value="登录" onmouseover="this.style.backgroundColor='#66B3FF'" onmouseout="this.style.backgroundColor='#0080FF'">
+            <br>
+            <br>
+            <font class="c6">点击「注册」按钮，即代表你同意</font><font style="color:#66B3FF;font-size:13px">《知乎协议》</font><br>
+            <p style="color:#0080FF; font-size:15px">注册机构号</p>
+             </div>
+            <p> </p>
+         <div style="text-align:center">
+            <input type="button" class="c7" value="下载知乎App">
+            <br>
+            <br>
+            <br>
+            <font style="font-size:10px;color:#ADADAD">知乎专栏 · 知乎圆桌 · 发现 · 移动应用 · 联系我们 · 来知乎工作</font><br>
+            <font style="font-size:10px;color:#ADADAD">© 2017 知乎 · 京 ICP 证 110745 号 · 京公网安备 11010802010035 号 · 出版物经营许可证 </font><br>
+            <font style="font-size:10px;color:#ADADAD">侵权举报 · 网上有害信息举报专区 · 儿童色情信息举报专区 · 违法和不良信息举报：010-82716601</font><br>
+             <hr class="c8">    
+            <font style="font-size:10px;color:#ADADAD">诚信网站示范企业</font>
+         </div>
+            <br>
+            <p> </p>
+        
+        
+        
+        
+    </body>
+</html>
